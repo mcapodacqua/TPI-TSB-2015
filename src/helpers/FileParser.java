@@ -26,9 +26,10 @@ public class FileParser {
                 Scanner sc2 = new Scanner(this.normalize(line));
                 //Split the line into words (uses space as separator)
                 while (sc2.hasNext()) {
-                    System.out.println(sc2.next());
+                    handler.handleContent(sc2.next());
                 }
             }
+            handler.processContent();
         } catch (IOException ex) {
             Logger.getLogger(TPITSB.class.getName()).log(Level.SEVERE, null, ex);
         }

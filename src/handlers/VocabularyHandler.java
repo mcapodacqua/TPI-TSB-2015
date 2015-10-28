@@ -1,5 +1,6 @@
 package handlers;
 
 public interface VocabularyHandler {
-    void doAction(String content);
+    void handleContent(String content);
+    void processContent();
 }
