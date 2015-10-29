@@ -22,11 +22,14 @@ public class TPITSB {
 //        } catch (SQLException ex) {
 //            Logger.getLogger(TPITSB.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-        File file = new File("libros" + File.separator + "test.txt");
+        long init = System.currentTimeMillis();
+        File file = new File("libros" + File.separator + "16082-8.txt");
         FileParser parser = new FileParser(file);
         PersistentHandler handler = new PersistentHandler(file);
         parser.parse(handler);
+        long end = System.currentTimeMillis();
         
+        System.out.println("Duration: " + (end-init));
         try {
             ResultSet rs = conn.createStatement().executeQuery("select * from vocabulary");
             while(rs.next()) {

@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.Normalizer;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import tpi.tsb.TPITSB;
 
 public class FileParser {
     private File file;
@@ -31,7 +28,7 @@ public class FileParser {
             }
             handler.processContent();
         } catch (IOException ex) {
-            Logger.getLogger(TPITSB.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error: " + ex.getMessage());
         }
     }
     

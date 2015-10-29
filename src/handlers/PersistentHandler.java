@@ -10,8 +10,6 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PersistentHandler implements VocabularyHandler{
     private String filename;
@@ -47,7 +45,7 @@ public class PersistentHandler implements VocabularyHandler{
                 stDelete.executeUpdate();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(PersistentHandler.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error: " + ex.getMessage());
         }
     }
     @Override
