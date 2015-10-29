@@ -22,6 +22,7 @@ public class TPITSB {
 //        } catch (SQLException ex) {
 //            Logger.getLogger(TPITSB.class.getName()).log(Level.SEVERE, null, ex);
 //        }
+//        System.exit(1);
         long init = System.currentTimeMillis();
         File file = new File("libros" + File.separator + "16082-8.txt");
         FileParser parser = new FileParser(file);
@@ -37,6 +38,7 @@ public class TPITSB {
             }
             conn.close();
         } catch (SQLException ex) {
+            System.out.println(ex);
             Logger.getLogger(TPITSB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -55,14 +55,22 @@ public class PersistentHandler implements VocabularyHandler{
                 PreparedStatement stat = conn.prepareStatement("INSERT INTO vocabulary (word,count,filename) VALUES (?,?,?)");
                 ){
             this.checkKnownFile(conn);
+            int i = 0;
+            conn.setAutoCommit(false);
             for (Entry<String,Long> item : map.entrySet()) {
                 String word = item.getKey();
                 Long count = item.getValue();
                 stat.setString(1, word);
                 stat.setLong(2, count);
                 stat.setString(3, filename);
-                stat.executeUpdate();
+                i++;
+                stat.addBatch();
+                if (i % 1000 == 0 || i == map.size()) {
+                    stat.executeBatch();
+                    conn.commit();
+                }
             }
+            conn.setAutoCommit(true);
         } catch (SQLException ex) {
             System.out.println("Error " + ex.getMessage());
         }
