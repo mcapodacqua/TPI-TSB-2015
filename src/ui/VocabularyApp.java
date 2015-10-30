@@ -10,6 +10,7 @@ import handlers.PersistentHandler;
 import helpers.FileParser;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -17,7 +18,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.RowFilter;
 import javax.swing.SwingWorker;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -31,7 +35,7 @@ public class VocabularyApp extends javax.swing.JFrame {
     public VocabularyApp() {
         initComponents();
         this.jProgressBar1.setVisible(false);
-        this.loadTable();
+        this.loadTable(null);
     }
     
 
@@ -49,6 +53,8 @@ public class VocabularyApp extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         jFileChooser1.setMultiSelectionEnabled(true);
 
@@ -63,10 +69,7 @@ public class VocabularyApp extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Palabra", "Repeticiones", "Cantidad de documentos"
@@ -82,6 +85,19 @@ public class VocabularyApp extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
 
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
+
+        jLabel1.setText("Filtro");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -90,7 +106,11 @@ public class VocabularyApp extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField1)
+                        .addGap(18, 18, 18)
                         .addComponent(jButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE))
@@ -99,7 +119,10 @@ public class VocabularyApp extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -122,6 +145,14 @@ public class VocabularyApp extends javax.swing.JFrame {
             worker.execute();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        this.loadTable(this.jTextField1.getText());
+    }//GEN-LAST:event_jTextField1KeyReleased
 
     /**
      * @param args the command line arguments
@@ -161,22 +192,30 @@ public class VocabularyApp extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
-    private void loadTable() {
+    private void loadTable(String filter) {
         Connection conn = ConnectionFactory.getConntection();
         try {
-            ResultSet rs = conn.createStatement().executeQuery("SELECT word, count FROM vocabulary");
-            int rowIndex = 0;
+            ResultSet rs;
+            if (filter != null && filter != "") {
+                PreparedStatement st = conn.prepareStatement("SELECT word, SUM(count), COUNT(filename) FROM vocabulary WHERE word LIKE ? GROUP BY word ORDER BY word");
+                st.setString(1, filter + "%");
+                rs = st.executeQuery();
+            } else {
+                rs = conn.createStatement().executeQuery("SELECT word, SUM(count), COUNT(filename) FROM vocabulary GROUP BY word ORDER BY word");
+            }
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.getDataVector().removeAllElements();
+            
             while(rs.next()) {
-                System.out.println( rs.getString(2) + "-" + rs.getLong(3) + "-" + rs.getString(4));
-                this.jTable1.setValueAt(rs.getString(1), rowIndex, 0);
-                this.jTable1.setValueAt(rs.getLong(2), rowIndex, 1);
-                this.jTable1.setValueAt(1, rowIndex, 2);
-                rowIndex++;
+                Object[] row = {rs.getString(1),rs.getLong(2),rs.getLong(3)};
+                model.addRow(row);
             }
             conn.close();
         } catch (SQLException ex) {
