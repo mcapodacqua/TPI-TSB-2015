@@ -13,8 +13,10 @@ public class LoadFileWorker extends SwingWorker<Void, Integer>{
     private File[] files;
     private JProgressBar progressBar;
     private JButton button;
+    private VocabularyApp app;
 
-    public LoadFileWorker(File[] files, JProgressBar progressBar, JButton button) {
+    public LoadFileWorker(VocabularyApp app, File[] files, JProgressBar progressBar, JButton button) {
+        this.app = app;
         this.files = files;
         this.progressBar = progressBar;
         this.button = button;
@@ -33,7 +35,6 @@ public class LoadFileWorker extends SwingWorker<Void, Integer>{
             i++;
             FileParser parser = new FileParser(file);
             parser.parse(new PersistentHandler(file));
-            System.out.println("Done processing " + i + file.getName());
             publish(i);
         }
         Thread.sleep(100);
@@ -41,12 +42,12 @@ public class LoadFileWorker extends SwingWorker<Void, Integer>{
         this.button.setEnabled(true);
         this.button.setOpaque(false);
         this.button.setText("Agregar Archivo/s");
+        this.app.loadTable();
         return null;
     }
 
     @Override
     protected void process(List<Integer> chunks) {
-        System.out.println("Chunks " + chunks.get(0) *100 / files.length);
         this.progressBar.setValue(chunks.get(0) * 100 / files.length);
     }
     

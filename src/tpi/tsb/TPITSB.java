@@ -17,7 +17,7 @@ import ui.VocabularyApp;
 public class TPITSB {
 
     public static void main(String[] args) {
-        Connection conn = ConnectionFactory.getConntection();
+//        Connection conn = ConnectionFactory.getConntection();
 //        try {
 //            conn.createStatement().execute("delete from vocabulary");
 //        } catch (SQLException ex) {
