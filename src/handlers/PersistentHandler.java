@@ -4,16 +4,14 @@ import database.ConnectionFactory;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class PersistentHandler implements VocabularyHandler{
-    private String filename;
-    private Map<String,Long> map = new HashMap<>();
+    private final String filename;
+    private final Map<String,Long> map = new HashMap<>();
 
     public PersistentHandler(String filename) {
         this.filename = filename;
@@ -32,6 +30,12 @@ public class PersistentHandler implements VocabularyHandler{
 
     }
 
+    /**
+     * Checks if the file already exists in our database.
+     * If so, we remove all the rows related to it
+     * (we assume that the user wants to process the data again).
+     * @param conn 
+     */
     private void checkKnownFile(Connection conn)
     {
         try (

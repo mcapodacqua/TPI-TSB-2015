@@ -10,10 +10,10 @@ import javax.swing.SwingWorker;
 
 public class LoadFileWorker extends SwingWorker<Void, Integer>{
 
-    private File[] files;
+    private final File[] files;
     private JProgressBar progressBar;
-    private JButton button;
-    private VocabularyApp app;
+    private final JButton button;
+    private final VocabularyApp app;
 
     public LoadFileWorker(VocabularyApp app, File[] files, JProgressBar progressBar, JButton button) {
         this.app = app;

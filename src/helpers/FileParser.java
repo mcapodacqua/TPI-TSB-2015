@@ -9,8 +9,15 @@ import java.io.InputStreamReader;
 import java.text.Normalizer;
 import java.util.Scanner;
 
+/**
+ * Separates a file into words.
+ * Basically by removing any non alphabetical content 
+ * of the word (like numbers, accents, symbos, etc)
+ * and delegates the control to a VocabularyHandler instance
+ * @see VocabularyHandler
+ */
 public class FileParser {
-    private File file;
+    private final File file;
 
     public FileParser(File file) {
         this.file = file;

@@ -133,10 +133,10 @@ public class VocabularyApp extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         int returnVal = this.jFileChooser1.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File[] files = this.jFileChooser1.getSelectedFiles();
+            //Delegates control to worker to run process in a different Thread
             SwingWorker worker = new LoadFileWorker(this, files, jProgressBar1, this.jButton1);
             worker.execute();
         }
@@ -196,25 +196,26 @@ public class VocabularyApp extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public void loadTable() {
-        Connection conn = ConnectionFactory.getConntection();
         String filter = this.jTextField1.getText();
-        try {
+        try (Connection conn = ConnectionFactory.getConntection();){
             ResultSet rs;
-            if (filter != null && filter != "") {
+            if (filter != null && !filter.equals("")) {
+                //Search based on input data
                 PreparedStatement st = conn.prepareStatement("SELECT word, SUM(count), COUNT(filename) FROM vocabulary WHERE word LIKE ? GROUP BY word ORDER BY word");
                 st.setString(1, filter + "%");
                 rs = st.executeQuery();
             } else {
+                //Search all the rows
                 rs = conn.createStatement().executeQuery("SELECT word, SUM(count), COUNT(filename) FROM vocabulary GROUP BY word ORDER BY word");
             }
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            //Refresh table model data
             model.getDataVector().removeAllElements();
             
             while(rs.next()) {
                 Object[] row = {rs.getString(1),rs.getLong(2),rs.getLong(3)};
                 model.addRow(row);
             }
-            conn.close();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
